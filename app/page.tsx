@@ -1,103 +1,142 @@
-import Image from "next/image";
-
-export default function Home() {
+"use client";
+import { motion } from "motion/react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Input from "@/components/ui/Input";
+export default function Page() {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [register, setRegister] = useState(false);
+  const [splash, setSplash] = useState(true);
+  const router = useRouter();
+  const handlerForm = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (register) {
+      localStorage.setItem(
+        "auth",
+        JSON.stringify({ username, email, password })
+      );
+      setSuccess("Account created successfully");
+      setRegister(false);
+    } else {
+      const auth = JSON.parse(localStorage.getItem("auth") || "{}");
+      if (auth.email !== email || auth.password !== password) {
+        setError("Invalid email or password");
+        return;
+      }
+      setSuccess("Login successful");
+      router.push("/users");
+    }
+  };
+  const clear = () => {
+    setUsername("");
+    setEmail("");
+    setPassword("");
+    setError("");
+    setSuccess("");
+  };
+  useEffect(() => {
+    setTimeout(() => {
+      setSplash(false);
+    }, 1500);
+  }, [splash]);
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
+    <div className="min-h-screen flex flex-col overflow-hidden">
+      <div className="flex-1 flex items-center justify-center">
+        <motion.img
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ ease: "easeInOut" }}
+          src="/assets/alibaba.png"
+          alt="Alibaba"
+          className="w-full h-auto max-w-[200px]"
         />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+      </div>
+      {!splash && (
+        <motion.form
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ ease: "easeInOut", duration: 0.3 }}
+          className="flex-2 bg-gray-800 rounded-t-3xl text-white py-4 px-4 flex flex-col"
+          onSubmit={handlerForm}
+        >
+          <div className="flex-1">
+            <h1 className="font-semibold text-xl">
+              {!register ? "Welcome back" : "Register Form"}
+            </h1>
+            <p className="text-gray-300">
+              {!register
+                ? "Please sign in to continue"
+                : "Create a new account"}
+            </p>
+            {register && (
+              <Input
+                className="mt-5"
+                label="Username"
+                type="text"
+                placeholder="yourname"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            )}
+            <Input
+              className="mt-5"
+              label="Email"
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+            <Input
+              className="mt-5"
+              label="Password"
+              type="password"
+              placeholder="•••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            {!register && (
+              <button
+                type="button"
+                className="text-gray-300 hover:text-gray-400 focus:text-gray-400 underline cursor-pointer mt-5"
+              >
+                Forgot password?
+              </button>
+            )}
+            {error ? (
+              <p className="text-red-400 mt-5">{error}</p>
+            ) : (
+              <p className="text-green-400 mt-5">{success}</p>
+            )}
+            <button
+              type="submit"
+              className="p-2 bg-orange-600 hover:bg-orange-700 focus:bg-orange-700 w-full rounded-md mt-5 cursor-pointer transition duration-300 font-medium"
+            >
+              {!register ? "Sign In" : "Sign Up"}
+            </button>
+            <p className="text-center mt-5">
+              {!register
+                ? "Don't have an account?"
+                : "Already have an account?"}{" "}
+              <span
+                onClick={() => {
+                  setRegister(!register);
+                  clear();
+                }}
+                className="text-orange-600 cursor-pointer hover:text-orange-700 focus:text-orange-700 transition duration-300 font-medium"
+              >
+                {register ? "Sign In" : "Sign Up"}
+              </span>
+            </p>
+          </div>
+          <div className="text-center">
+            &copy; {new Date().getFullYear()} ArnDev. Prototype Version.
+          </div>
+        </motion.form>
+      )}
     </div>
   );
 }
